@@ -19,7 +19,7 @@
 {#await tasksRequest}
   loading timeline...
 {:then tasks}
-  <div class="wrapper flex-1 overflow-auto">
+  <div class="wrapper flex flex-1 flex-col items-start overflow-auto">
     <TimelineDays />
 
     {#each tasks as task}
