@@ -3,11 +3,10 @@ import { derived, writable } from 'svelte/store'
 import { user } from './auth'
 
 // Start showing 70 days before just like the actual Toggl Plan
-export let timelineStartDate = writable(dayjs().subtract(7, 'days'))
+export let timelineStartDate = writable(dayjs().subtract(70, 'days'))
 
 // Start showing 68 days after just like the actual Toggl Plan
-// export let timelineEndDate = writable(dayjs().add(68, 'days'))
-export let timelineEndDate = writable(dayjs().add(8, 'days'))
+export let timelineEndDate = writable(dayjs().add(68, 'days'))
 
 type Day = {
   date: Dayjs

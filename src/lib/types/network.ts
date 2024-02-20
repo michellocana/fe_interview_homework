@@ -16,6 +16,9 @@ export type AuthenticateTokenResponse = {
 export type MeResponse = User
 
 /* Tasks */
-export type TasksRequest = {}
+export type TasksRequest = {
+  since: string
+  until: string
+}
 
 export type TasksResponse = Task[]

@@ -53,7 +53,9 @@
     }
 
     for (let index = partialStart; index < partialEnd; index++) {
-      fullDisposition[index][row] = task
+      if (fullDisposition[index]) {
+        fullDisposition[index][row] = task
+      }
     }
 
     // We always increase the row by one because to convert an array index into a css grid row (0 -> 1, 1 -> 2, etc)
