@@ -1,3 +1,4 @@
+/* Authenticate token */
 export type AuthenticateTokenRequest = {
   code: string
   grant_type: 'authorization_code'
@@ -11,4 +12,13 @@ export type AuthenticateTokenResponse = {
   token_type: string
 }
 
+/* Me */
 export type MeResponse = User
+
+/* Tasks */
+export type TasksRequest = {
+  since: string
+  until: string
+}
+
+export type TasksResponse = Task[]
