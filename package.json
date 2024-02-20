@@ -28,6 +28,7 @@
 	},
 	"dependencies": {
 		"axios": "^1.6.7",
-		"dayjs": "^1.11.10"
+		"dayjs": "^1.11.10",
+		"get-relative-luminance": "^1.0.0"
 	}
 }

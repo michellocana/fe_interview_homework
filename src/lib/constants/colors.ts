@@ -52,3 +52,5 @@ export const TASK_COLORS: TaskColor[] = [
   { id: 44, rgb: 'rgb(69, 90, 100)' },
   { id: 45, rgb: 'rgb(38, 50, 56)' },
 ]
+
+export const DEFAULT_TASK_COLOR = { id: 30, rgb: 'rgb(168, 118, 245)' }

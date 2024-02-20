@@ -6,7 +6,7 @@
   const today = dayjs()
 </script>
 
-<style>
+<style lang="postcss">
   .days {
     padding: 10px 0;
     border-bottom: 1px solid;

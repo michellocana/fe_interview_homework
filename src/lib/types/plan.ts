@@ -91,7 +91,7 @@ type Task = {
   visible_properties: ['checklist', 'estimate', 'notes']
   checklist_items: CheckListItem[]
   parent_id: null
-  color_id: 9
+  color_id: number
   notes: string
 }
 

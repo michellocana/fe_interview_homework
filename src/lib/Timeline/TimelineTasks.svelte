@@ -1,19 +1,15 @@
 <script lang="ts">
   import dayjs from 'dayjs'
-  import { TASK_COLORS } from '../constants/colors'
+  import { DEFAULT_TASK_COLOR, TASK_COLORS } from '../constants/colors'
   import { TIMELINE_DAY_SIZE, TIMELINE_START_ROW } from '../constants/timeline'
   import { days, timelineStartDate } from '../stores/timeline'
   import type { TasksResponse } from '../types/network'
+  import TimelineTask from './TimelineTask.svelte'
+  import type { TaskDisposition } from '../types/timeline'
 
   export let tasks: TasksResponse
 
   let fullDisposition = Array.from({ length: $days.length }).map<Task[]>((a) => [])
-
-  type TaskDisposition = {
-    row: number
-    columnStart: number
-    columnEnd: number
-  }
 
   let tasksDisposition = Array.from({ length: tasks.length }).map<TaskDisposition>(() => ({
     row: 0,
@@ -69,7 +65,7 @@
   const maxRow = Math.max(...tasksDisposition.map((disposition) => disposition.row))
 </script>
 
-<style>
+<style lang="postcss">
   .wrapper {
     position: relative;
   }
@@ -92,21 +88,13 @@
 
   .day {
     border-right: 1px solid;
-    @apply border-slate-300;
     grid-row: 1 / -1;
     grid-column: var(--day-column);
+    @apply border-slate-300;
   }
 
   .dayIsWeekend {
-    @apply bg-slate-200;
-    @apply bg-opacity-60;
-  }
-
-  .task {
-    grid-row: var(--task-row);
-    grid-column: var(--task-column-start) / var(--task-column-end);
-    border: 1px solid;
-    @apply border-red-400;
+    @apply bg-slate-200 bg-opacity-60;
   }
 </style>
 
@@ -122,17 +110,9 @@
     style="--grid-rows: {maxRow}; --grid-columns: {$days.length}; --grid-column-size: {TIMELINE_DAY_SIZE}"
   >
     {#each tasks as task, index}
-      {@const color = TASK_COLORS.find((taskColor) => taskColor.id === task.color_id)?.rgb ?? 'black'}
       {@const disposition = tasksDisposition[index]}
 
-      <div
-        class="task m-1 rounded-md p-1 text-sm"
-        style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}"
-      >
-        {task.name} - {task.weight.toFixed(3)}
-
-        <br />
-      </div>
+      <TimelineTask {task} {disposition} />
     {/each}
   </div>
 </div>
