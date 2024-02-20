@@ -96,12 +96,21 @@
   .dayIsWeekend {
     @apply bg-slate-200 bg-opacity-60;
   }
+
+  .dayIsToday {
+    @apply bg-orange-300 bg-opacity-30;
+  }
 </style>
 
 <div class="wrapper flex-1">
   <div class="gridWrapper days">
     {#each $days as day, index}
-      <div class="day bg-slate-50" class:dayIsWeekend={day.isWeekend} style="--day-column: {index}"></div>
+      <div
+        class="day bg-slate-50"
+        class:dayIsWeekend={day.isWeekend}
+        class:dayIsToday={day.isToday}
+        style="--day-column: {index + 1}"
+      ></div>
     {/each}
   </div>
 
@@ -111,7 +120,6 @@
   >
     {#each tasks as task, index}
       {@const disposition = tasksDisposition[index]}
-
       <TimelineTask {task} {disposition} />
     {/each}
   </div>

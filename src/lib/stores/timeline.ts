@@ -3,12 +3,11 @@ import { derived, writable } from 'svelte/store'
 import { user } from './auth'
 
 // Start showing 70 days before just like the actual Toggl Plan
-// export let timelineStartDate = writable(dayjs().subtract(70, 'days'))
-export let timelineStartDate = writable(dayjs().subtract(6, 'days'))
+export let timelineStartDate = writable(dayjs().subtract(7, 'days'))
 
 // Start showing 68 days after just like the actual Toggl Plan
 // export let timelineEndDate = writable(dayjs().add(68, 'days'))
-export let timelineEndDate = writable(dayjs().add(16, 'days'))
+export let timelineEndDate = writable(dayjs().add(8, 'days'))
 
 type Day = {
   date: Dayjs
@@ -16,6 +15,7 @@ type Day = {
   isFirstOfTheMonth: boolean
   isWeekend: boolean
   isStartOfWeek: boolean
+  isToday: boolean
 }
 
 export let days = derived(
@@ -23,6 +23,7 @@ export let days = derived(
   ([$timelineStartDate, $timelineEndDate, $user]) => {
     const { hide_weekends: hideWeekends, start_of_week: startOfWeek } = $user.preferences
     const daysToShow = $timelineEndDate.diff($timelineStartDate, 'days')
+    const today = dayjs()
 
     return Array.from({ length: daysToShow })
       .map((_, index) => {
@@ -38,6 +39,7 @@ export let days = derived(
           // and if it's not visible we assume that the start of the week is monday.
           isStartOfWeek:
             date.day() === startOfWeek || (hideWeekends && date.day() === 1 && [0, 6].includes(startOfWeek)),
+          isToday: date.isSame(today, 'day'),
         } satisfies Day
       })
       .filter((day) => {

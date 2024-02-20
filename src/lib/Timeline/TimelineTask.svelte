@@ -25,9 +25,11 @@
 </style>
 
 <div
-  class="task m-1 rounded-md p-1 text-sm"
+  class="task m-1 rounded-md px-2 py-1 text-sm"
   class:taskIsDark={isDarkColor}
   style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}; --task-background: {color?.rgb}"
 >
-  {task.name}
+  <span class="font-bold">
+    {task.name}
+  </span>
 </div>
