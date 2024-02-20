@@ -56,3 +56,49 @@ type Workspace = {
   working_minutes_per_tuesday: number
   working_minutes_per_wednesday: number
 }
+
+type Task = {
+  daily_estimated_minutes: null
+  task_type: string
+  plan_status_position: null
+  timeline_segment_id: number
+  tracked: false
+  weight: number
+  created_by: number
+  created_at: string
+  id: number
+  is_last_repetition: false
+  tracking: null
+  plan_id: number
+  tag_ids: []
+  name: string
+  end_date: string
+  start_date: string
+  estimate_type: string
+  updated_at: string
+  estimated_minutes: number
+  color: number
+  workspace_members: number[]
+  status: string
+  repetition_rule: null
+  folder_id: number
+  estimate_skips_weekend: true
+  done: false
+  end_time: null
+  original_repeated_task_id: null
+  start_time: null
+  updated_by: number
+  visible_properties: ['checklist', 'estimate', 'notes']
+  checklist_items: CheckListItem[]
+  parent_id: null
+  color_id: 9
+  notes: string
+}
+
+type CheckListItem = {
+  created_at: string
+  description: string
+  done: false
+  id: number
+  position: number
+}

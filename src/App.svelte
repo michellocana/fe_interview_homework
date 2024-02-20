@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import Timeline from './lib/Timeline.svelte'
+  import Timeline from './lib/Timeline/Timeline.svelte'
   import { accessToken, user } from './lib/stores/auth'
   import { api } from './api'
   import type { AuthenticateTokenRequest, AuthenticateTokenResponse, MeResponse } from './lib/types/network'
