@@ -7,7 +7,7 @@
 
   export let tasks: TasksResponse
 
-  let fullDisposition = Array.from({ length: $days.length }).map<number[]>((a) => [])
+  let fullDisposition = Array.from({ length: $days.length }).map<Task[]>((a) => [])
 
   type TaskDisposition = {
     row: number
@@ -37,7 +37,17 @@
     let row: number | null = null
 
     for (let index = 0; index < rowPossibilities; index++) {
-      if (partialDisposition.every((column) => !column[index])) {
+      // Check if the task fits in the remaining space
+      const hasRoomToFit = partialDisposition.every((column) => !column[index])
+
+      // Sometimes the task might fit in the space that is empty, but the task weight
+      // is bigger than the limit, so we just skip the task in that case
+      const hasProperWeight = partialDisposition.every((column) => {
+        const nextRows = column.slice(index + 1)
+        return nextRows.every((currentTask) => currentTask.weight >= task.weight)
+      })
+
+      if (hasRoomToFit && hasProperWeight) {
         row = index
       }
     }
@@ -47,7 +57,7 @@
     }
 
     for (let index = partialStart; index < partialEnd; index++) {
-      fullDisposition[index][row] = task.id
+      fullDisposition[index][row] = task
     }
 
     // We always increase the row by one because to convert an array index into a css grid row (0 -> 1, 1 -> 2, etc)
@@ -119,7 +129,7 @@
         class="task m-1 rounded-md p-1 text-sm"
         style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}"
       >
-        {task.name}
+        {task.name} - {task.weight.toFixed(3)}
 
         <br />
       </div>
