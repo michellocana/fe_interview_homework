@@ -2,6 +2,7 @@
   import { DEFAULT_TASK_COLOR, TASK_COLORS } from '../constants/colors'
   import type { TaskDisposition } from '../types/timeline'
   import getRelativeLuminance from 'get-relative-luminance'
+  import TimelineTaskCard from './TimelineTaskCard.svelte'
 
   export let task: Task
   export let disposition: TaskDisposition
@@ -9,27 +10,24 @@
   const color = TASK_COLORS.find((taskColor) => taskColor.id === task.color_id) ?? DEFAULT_TASK_COLOR
   const luminance = getRelativeLuminance(color.rgb)
   const isDarkColor = luminance <= 0.5
+
+  let isDragging: boolean = false
 </script>
 
-<style lang="postcss">
-  .task {
-    grid-row: var(--task-row);
-    grid-column: var(--task-column-start) / var(--task-column-end);
-    background-color: var(--task-background);
-    @apply text-slate-900;
-  }
+{#if isDragging}
+  <!-- TODO(michell): implement drag and drop -->
+  <TimelineTaskCard isGhost {isDragging} {disposition} {task} element="div" />
+{/if}
 
-  .taskIsDark {
-    @apply text-white;
-  }
-</style>
-
-<div
-  class="task m-1 rounded-md px-2 py-1 text-sm"
-  class:taskIsDark={isDarkColor}
-  style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}; --task-background: {color?.rgb}"
->
-  <span class="font-bold">
-    {task.name}
-  </span>
-</div>
+<TimelineTaskCard
+  {isDragging}
+  {disposition}
+  {task}
+  element="button"
+  on:mousedown={(event) => {
+    isDragging = true
+  }}
+  on:mouseup={(event) => {
+    isDragging = false
+  }}
+/>
