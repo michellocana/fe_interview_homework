@@ -1,3 +1,5 @@
+import type { Task, User } from './plan'
+
 /* Authenticate token */
 export type AuthenticateTokenRequest = {
   code: string
