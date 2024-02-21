@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { DEFAULT_TASK_COLOR, TASK_COLORS } from '../constants/colors'
-  import type { Task } from '../types/plan'
-  import type { TaskDisposition } from '../types/timeline'
   import getRelativeLuminance from 'get-relative-luminance'
+  import type { Task } from '../../types/plan'
+  import type { TaskDisposition } from '../../types/timeline'
+  import { DEFAULT_TASK_COLOR, TASK_COLORS } from '../../constants/colors'
 
   export let element: 'button' | 'div'
   export let task: Task

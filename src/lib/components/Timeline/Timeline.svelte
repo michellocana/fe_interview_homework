@@ -1,20 +1,21 @@
 <script lang="ts">
   import dayjs from 'dayjs'
   import { onMount } from 'svelte'
-  import { api } from '../../api'
-  import { TIMELINE_DAY_SIZE } from '../constants/timeline'
-  import { timelineEndDate, timelineStartDate } from '../stores/timeline'
-  import type { TasksRequest, TasksResponse } from '../types/network'
-  import type { Task } from '../types/plan'
+
   import TimelineDays from './TimelineDays.svelte'
   import TimelineTasks from './TimelineTasks.svelte'
+  import type { TasksRequest, TasksResponse } from '../../types/network'
+  import { timelineEndDate, timelineStartDate } from '../../stores/timeline'
+  import { api } from '../../../api'
+  import { TIMELINE_DAY_SIZE } from '../../constants/timeline'
+  import { config } from '../../stores/auth'
 
   let tasks: TasksResponse
   let isFetchingTasks = true
   let didScrollToStartDay = false
 
   onMount(async () => {
-    const result = await api.get<TasksResponse>(`${import.meta.env.VITE_TOGGL_PLAN_WORKSPACE_ID}/tasks`, {
+    const result = await api.get<TasksResponse>(`${$config.workspaceId}/tasks`, {
       params: {
         since: $timelineStartDate.toISOString(),
         until: $timelineEndDate.toISOString(),

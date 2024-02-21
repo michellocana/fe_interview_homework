@@ -1,12 +1,11 @@
 <script lang="ts">
   import dayjs from 'dayjs'
-  import { DEFAULT_TASK_COLOR, TASK_COLORS } from '../constants/colors'
-  import { TIMELINE_DAY_SIZE, TIMELINE_START_ROW } from '../constants/timeline'
-  import { days, timelineStartDate } from '../stores/timeline'
-  import type { TasksResponse } from '../types/network'
+  import type { TaskDisposition } from '../../types/timeline'
+  import type { Task } from '../../types/plan'
+  import { days, timelineStartDate } from '../../stores/timeline'
+  import type { TasksResponse } from '../../types/network'
+  import { TIMELINE_DAY_SIZE, TIMELINE_START_ROW } from '../../constants/timeline'
   import TimelineTask from './TimelineTask.svelte'
-  import type { TaskDisposition } from '../types/timeline'
-  import type { Task } from '../types/plan'
 
   export let tasks: TasksResponse
   export let onTaskDragEnd: (task: Task, x: number, y: number) => void = () => {}

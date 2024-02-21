@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import Timeline from './lib/Timeline/Timeline.svelte'
-  import { accessToken, user } from './lib/stores/auth'
-  import { api } from './api'
-  import type { AuthenticateTokenRequest, AuthenticateTokenResponse, MeResponse } from './lib/types/network'
-  import { AUTH_REDIRECT_URI, TOGGL_PLAN_BASE_URL } from './url'
   import type { AxiosResponse } from 'axios'
+  import { onMount } from 'svelte'
+  import { api } from './api'
+  import Login from './lib/components/Login/Login.svelte'
+  import Timeline from './lib/components/Timeline/Timeline.svelte'
+  import { accessToken, config, user } from './lib/stores/auth'
+  import type { AuthenticateTokenRequest, AuthenticateTokenResponse, MeResponse } from './lib/types/network'
+  import Spinner from './lib/components/UI/Spinner.svelte'
 
   let isLoading = true
   let isLogged = false
@@ -15,9 +16,7 @@
     const code = urlParams.get('code')
 
     if (code && !$accessToken) {
-      const encodedToken = btoa(
-        `${import.meta.env.VITE_TOGGL_PLAN_CLIENT_ID}:${import.meta.env.VITE_TOGGL_PLAN_SECRET_ID}`,
-      )
+      const encodedToken = btoa(`${$config.clientId}:${$config.secretId}`)
 
       const tokenResult = await api.post<
         AuthenticateTokenResponse,
@@ -28,7 +27,7 @@
         {
           code,
           grant_type: 'authorization_code',
-          client_id: import.meta.env.VITE_TOGGL_PLAN_CLIENT_ID,
+          client_id: $config.clientId,
         },
         {
           headers: {
@@ -50,22 +49,23 @@
   })
 </script>
 
-{#if isLoading}
-  Loading...
-{:else if !isLogged}
-  <!-- TODO(michell): implement Button component -->
-  <div class="m-2">
-    <p>Sign in to continue</p>
-    <a
-      href={`${TOGGL_PLAN_BASE_URL}/oauth/login?response_type=code&client_id=${import.meta.env.VITE_TOGGL_PLAN_CLIENT_ID}&redirect_uri=${encodeURIComponent(AUTH_REDIRECT_URI)}`}
-      class="inline-block rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-      >Login
-    </a>
-  </div>
-{:else}
-  <div class="m-2 flex items-center gap-2">
-    <img src={$user.picture_url} alt={$user.name} class="rounded-full" />
-    <p>Welcome, {$user.name}</p>
-  </div>
-  <Timeline />
-{/if}
+<div class="flex flex-1 items-center justify-center bg-slate-50">
+  {#if isLoading}
+    <p class="flex items-center gap-3 text-base text-slate-800">
+      <Spinner />
+      Loading...
+    </p>
+  {:else if !isLogged}
+    <Login />
+  {:else}
+    <div class="flex w-full flex-1 self-stretch">
+      <!-- TODO(michell): improve header -->
+      <div class="relative z-10 flex w-72 flex-none items-start gap-2 bg-fuchsia-950 p-2 shadow-xl shadow-slate-900">
+        <img src={$user.picture_url} alt={$user.name} class="rounded-full" />
+        <p class="text-slate-100">Welcome, {$user.name}</p>
+      </div>
+
+      <Timeline />
+    </div>
+  {/if}
+</div>
