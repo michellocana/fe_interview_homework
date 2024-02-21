@@ -9,6 +9,7 @@
   import { api } from '../../../api'
   import { TIMELINE_DAY_SIZE } from '../../constants/timeline'
   import { config } from '../../stores/auth'
+  import Spinner from '../UI/Spinner.svelte'
 
   let tasks: TasksResponse
   let isFetchingTasks = true
@@ -39,7 +40,10 @@
 </script>
 
 {#if isFetchingTasks}
-  loading timeline...
+  <p class="flex w-full items-center justify-center gap-3 text-base text-slate-800">
+    <Spinner />
+    Loading timeline...
+  </p>
 {:else if tasks}
   <div class="flex flex-1 flex-col items-start overflow-auto" bind:this={wrapper}>
     <TimelineDays />

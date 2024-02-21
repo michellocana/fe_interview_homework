@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 import { ACCESS_TOKEN_KEY, CLIENT_ID_KEY, SECRET_ID_KEY, WORKSPACE_ID_KEY } from '../constants/localStorage'
 import type { User } from '../types/plan'
 
@@ -45,3 +45,4 @@ function createConfigStore() {
 export let accessToken = createAccessTokenStore()
 export let config = createConfigStore()
 export let user = writable<User>()
+export let workspace = derived(user, ($user) => $user.workspaces.find((workspace) => workspace.active))
