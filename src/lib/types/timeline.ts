@@ -3,3 +3,8 @@ export type TaskDisposition = {
   columnStart: number
   columnEnd: number
 }
+
+export type RemainingTimeInfo = {
+  remainingTime: number
+  hasWorkingHours: boolean
+}

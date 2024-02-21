@@ -58,7 +58,7 @@ export type Workspace = {
 }
 
 export type Task = {
-  daily_estimated_minutes: null
+  daily_estimated_minutes: number
   task_type: string
   plan_status_position: null
   timeline_segment_id: number
@@ -74,7 +74,7 @@ export type Task = {
   name: string
   end_date: string
   start_date: string
-  estimate_type: string
+  estimate_type: 'total' | 'daily'
   updated_at: string
   estimated_minutes: number
   color: number

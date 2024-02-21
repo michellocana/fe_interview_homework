@@ -1,20 +1,24 @@
 <script lang="ts">
   import dayjs from 'dayjs'
-  import type { TaskDisposition } from '../../types/timeline'
+  import type { RemainingTimeInfo, TaskDisposition } from '../../types/timeline'
   import type { Task } from '../../types/plan'
   import { days, timelineStartDate } from '../../stores/timeline'
   import type { TasksResponse } from '../../types/network'
   import { TIMELINE_DAY_SIZE, TIMELINE_START_ROW } from '../../constants/timeline'
   import TimelineTask from './TimelineTask.svelte'
+  import { workspace } from '../../stores/auth'
 
   export let tasks: TasksResponse
   export let onTaskDragEnd: (task: Task, x: number, y: number) => void = () => {}
 
   let maxRow: number
   let tasksDisposition: TaskDisposition[]
+  let remainingTimes: RemainingTimeInfo[]
+  let fullDisposition: Task[][]
 
   $: {
-    const fullDisposition = Array.from({ length: $days.length }).map<Task[]>((a) => [])
+    // Tasks disposition logic
+    fullDisposition = Array.from({ length: $days.length }).map<Task[]>((a) => [])
 
     tasksDisposition = Array.from({ length: tasks.length }).map<TaskDisposition>(() => ({
       row: 0,
@@ -70,6 +74,59 @@
     })
 
     maxRow = Math.max(...tasksDisposition.map((disposition) => disposition.row))
+
+    // Remaining time logic
+    if ($workspace) {
+      const workingMinutes = [
+        $workspace.working_minutes_per_sunday,
+        $workspace.working_minutes_per_monday,
+        $workspace.working_minutes_per_tuesday,
+        $workspace.working_minutes_per_wednesday,
+        $workspace.working_minutes_per_thursday,
+        $workspace.working_minutes_per_friday,
+        $workspace.working_minutes_per_saturday,
+      ]
+
+      remainingTimes = Array.from<RemainingTimeInfo>({ length: $days.length }).map((_, index) => {
+        const dayWorkingMinutes = workingMinutes[$days[index].date.day()]
+        const dayTasks = fullDisposition[index].filter(Boolean)
+
+        const dayRemainingTime = dayTasks.reduce((acc, task) => {
+          if (task.estimate_type === 'total') {
+            console.log(task)
+            return acc - task.daily_estimated_minutes
+          }
+
+          return acc - task.estimated_minutes
+        }, dayWorkingMinutes)
+
+        return {
+          remainingTime: dayRemainingTime,
+          hasWorkingHours: dayWorkingMinutes !== 0,
+        }
+      })
+    }
+  }
+
+  function getRemainingTimeLabel(remainingTime: number) {
+    const rawValue = Math.abs(remainingTime)
+    let label: string = ''
+
+    if (remainingTime === 0) {
+      return '--'
+    }
+
+    if (remainingTime < 0) {
+      label += '+'
+    }
+
+    if (rawValue >= 60) {
+      label += Number((rawValue / 60).toFixed(1)) + 'h'
+    } else {
+      label += rawValue + 'm'
+    }
+
+    return label
   }
 </script>
 
@@ -108,6 +165,18 @@
   .dayIsToday {
     @apply bg-orange-300 bg-opacity-30;
   }
+
+  .remainingTimePositive {
+    @apply text-purple-500;
+  }
+
+  .remainingTimeNegative {
+    @apply text-red-400;
+  }
+
+  .remainingTimeEmpty {
+    @apply text-slate-400;
+  }
 </style>
 
 <div class="wrapper flex-1">
@@ -126,6 +195,22 @@
     class="gridWrapper tasks"
     style="--grid-rows: {maxRow}; --grid-columns: {$days.length}; --grid-column-size: {TIMELINE_DAY_SIZE}"
   >
+    {#each remainingTimes as day, index}
+      {@const hasTasks = fullDisposition[index].filter(Boolean).length}
+
+      {#if hasTasks && day.hasWorkingHours}
+        <span
+          class="flex items-center justify-center text-xs font-bold"
+          class:remainingTimePositive={day.remainingTime > 0}
+          class:remainingTimeNegative={day.remainingTime < 0}
+          class:remainingTimeEmpty={day.remainingTime === 0}
+          style:grid-row="1"
+          style:grid-column={index + 1}
+        >
+          {getRemainingTimeLabel(day.remainingTime)}
+        </span>
+      {/if}
+    {/each}
     {#each tasks as task, index}
       {@const disposition = tasksDisposition[index]}
       <TimelineTask {task} {disposition} onDragEnd={(x, y) => onTaskDragEnd(task, x, y)} />
