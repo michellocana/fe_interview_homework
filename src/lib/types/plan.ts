@@ -1,4 +1,4 @@
-type User = {
+export type User = {
   color_id: number
   created_at: string
   email: string
@@ -36,7 +36,7 @@ type User = {
   workspaces: Workspace[]
 }
 
-type Workspace = {
+export type Workspace = {
   active: boolean
   created_at: string
   custom_colors: []
@@ -57,7 +57,7 @@ type Workspace = {
   working_minutes_per_wednesday: number
 }
 
-type Task = {
+export type Task = {
   daily_estimated_minutes: null
   task_type: string
   plan_status_position: null
@@ -95,7 +95,7 @@ type Task = {
   notes: string
 }
 
-type CheckListItem = {
+export type CheckListItem = {
   created_at: string
   description: string
   done: false

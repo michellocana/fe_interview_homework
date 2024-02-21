@@ -1,5 +1,6 @@
 <script lang="ts">
   import { DEFAULT_TASK_COLOR, TASK_COLORS } from '../constants/colors'
+  import type { Task } from '../types/plan'
   import type { TaskDisposition } from '../types/timeline'
   import getRelativeLuminance from 'get-relative-luminance'
 
@@ -8,6 +9,8 @@
   export let disposition: TaskDisposition
   export let isDragging: boolean
   export let isGhost: boolean = false
+  export let x: number = 0
+  export let y: number = 0
 
   const color = TASK_COLORS.find((taskColor) => taskColor.id === task.color_id) ?? DEFAULT_TASK_COLOR
   const luminance = getRelativeLuminance(color.rgb)
@@ -33,6 +36,8 @@
   }
 
   .taskIsDragging {
+    position: relative;
+    z-index: 1;
   }
 </style>
 
@@ -44,7 +49,7 @@
   class:taskIsBeingDragged={isGhost && isDragging}
   class:taskIsDragging={!isGhost && isDragging}
   style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}; --task-background: {color?.rgb}"
-  on:click
+  style:transform="translate({x}px, {y}px)"
   on:mousedown
   on:mouseup
 >
