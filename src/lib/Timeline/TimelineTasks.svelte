@@ -6,65 +6,72 @@
   import type { TasksResponse } from '../types/network'
   import TimelineTask from './TimelineTask.svelte'
   import type { TaskDisposition } from '../types/timeline'
+  import type { Task } from '../types/plan'
 
   export let tasks: TasksResponse
+  export let onTaskDragEnd: (task: Task, x: number, y: number) => void = () => {}
 
-  let fullDisposition = Array.from({ length: $days.length }).map<Task[]>((a) => [])
+  let maxRow: number
+  let tasksDisposition: TaskDisposition[]
 
-  let tasksDisposition = Array.from({ length: tasks.length }).map<TaskDisposition>(() => ({
-    row: 0,
-    columnStart: 0,
-    columnEnd: 0,
-  }))
+  $: {
+    const fullDisposition = Array.from({ length: $days.length }).map<Task[]>((a) => [])
 
-  tasks.forEach((task, taskIndex) => {
-    const taskStartDate = dayjs(task.start_date)
-    const taskEndDate = dayjs(task.end_date)
-    const columnStart = Math.ceil(taskStartDate.diff($timelineStartDate, 'day', true)) + 1
-    const columnEnd = columnStart + taskEndDate.diff(taskStartDate, 'day') + 1
+    tasksDisposition = Array.from({ length: tasks.length }).map<TaskDisposition>(() => ({
+      row: 0,
+      columnStart: 0,
+      columnEnd: 0,
+    }))
 
-    const partialStart = columnStart - 1
-    const partialEnd = columnEnd - 1
+    tasks.forEach((task, taskIndex) => {
+      const taskStartDate = dayjs(task.start_date)
+      const taskEndDate = dayjs(task.end_date)
+      const columnStart = Math.ceil(taskStartDate.diff($timelineStartDate, 'day', true)) + 1
+      const columnEnd = columnStart + taskEndDate.diff(taskStartDate, 'day') + 1
 
-    const partialDisposition = fullDisposition.slice(partialStart, partialEnd)
+      const partialStart = columnStart - 1
+      const partialEnd = columnEnd - 1
 
-    const rowPossibilities = Math.max(...partialDisposition.map((arr) => arr.length))
+      const partialDisposition = fullDisposition.slice(partialStart, partialEnd)
 
-    let row: number | null = null
+      const rowPossibilities = Math.max(...partialDisposition.map((arr) => arr.length))
 
-    for (let index = 0; index < rowPossibilities; index++) {
-      // Check if the task fits in the remaining space
-      const hasRoomToFit = partialDisposition.every((column) => !column[index])
+      let row: number | null = null
 
-      // Sometimes the task might fit in the space that is empty, but the task weight
-      // is bigger than the limit, so we just skip the task in that case
-      const hasProperWeight = partialDisposition.every((column) => {
-        const nextRows = column.slice(index + 1)
-        return nextRows.every((currentTask) => currentTask.weight >= task.weight)
-      })
+      for (let index = 0; index < rowPossibilities; index++) {
+        // Check if the task fits in the remaining space
+        const hasRoomToFit = partialDisposition.every((column) => !column[index])
 
-      if (hasRoomToFit && hasProperWeight) {
-        row = index
+        // Sometimes the task might fit in the space that is empty, but the task weight
+        // is bigger than the limit, so we just skip the task in that case
+        const hasProperWeight = partialDisposition.every((column) => {
+          const nextRows = column.slice(index + 1)
+          return nextRows.every((currentTask) => currentTask.weight >= task.weight)
+        })
+
+        if (hasRoomToFit && hasProperWeight) {
+          row = index
+        }
       }
-    }
 
-    if (row === null) {
-      row = Math.max(...partialDisposition.map((arr) => arr.length))
-    }
-
-    for (let index = partialStart; index < partialEnd; index++) {
-      if (fullDisposition[index]) {
-        fullDisposition[index][row] = task
+      if (row === null) {
+        row = Math.max(...partialDisposition.map((arr) => arr.length))
       }
-    }
 
-    // We always increase the row by one because to convert an array index into a css grid row (0 -> 1, 1 -> 2, etc)
-    tasksDisposition[taskIndex].row = row + TIMELINE_START_ROW + 1
-    tasksDisposition[taskIndex].columnStart = columnStart
-    tasksDisposition[taskIndex].columnEnd = columnEnd
-  })
+      for (let index = partialStart; index < partialEnd; index++) {
+        if (fullDisposition[index]) {
+          fullDisposition[index][row] = task
+        }
+      }
 
-  const maxRow = Math.max(...tasksDisposition.map((disposition) => disposition.row))
+      // We always increase the row by one because to convert an array index into a css grid row (0 -> 1, 1 -> 2, etc)
+      tasksDisposition[taskIndex].row = row + TIMELINE_START_ROW + 1
+      tasksDisposition[taskIndex].columnStart = columnStart
+      tasksDisposition[taskIndex].columnEnd = columnEnd
+    })
+
+    maxRow = Math.max(...tasksDisposition.map((disposition) => disposition.row))
+  }
 </script>
 
 <style lang="postcss">
@@ -122,7 +129,7 @@
   >
     {#each tasks as task, index}
       {@const disposition = tasksDisposition[index]}
-      <TimelineTask {task} {disposition} />
+      <TimelineTask {task} {disposition} onDragEnd={(x, y) => onTaskDragEnd(task, x, y)} />
     {/each}
   </div>
 </div>

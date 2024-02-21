@@ -1,24 +1,29 @@
 <script lang="ts">
   import dayjs from 'dayjs'
+  import { onMount } from 'svelte'
   import { api } from '../../api'
   import { TIMELINE_DAY_SIZE } from '../constants/timeline'
   import { timelineEndDate, timelineStartDate } from '../stores/timeline'
   import type { TasksRequest, TasksResponse } from '../types/network'
+  import type { Task } from '../types/plan'
   import TimelineDays from './TimelineDays.svelte'
   import TimelineTasks from './TimelineTasks.svelte'
 
-  let tasksRequest = fetchTasks()
-  let didScrollToStartDay: boolean = false
+  let tasks: TasksResponse
+  let isFetchingTasks = true
+  let didScrollToStartDay = false
 
-  async function fetchTasks() {
+  onMount(async () => {
     const result = await api.get<TasksResponse>(`${import.meta.env.VITE_TOGGL_PLAN_WORKSPACE_ID}/tasks`, {
       params: {
         since: $timelineStartDate.toISOString(),
         until: $timelineEndDate.toISOString(),
       } satisfies TasksRequest,
     })
-    return result.data.sort((taskA, taskB) => taskA.weight - taskB.weight)
-  }
+
+    tasks = result.data.sort((taskA, taskB) => taskA.weight - taskB.weight)
+    isFetchingTasks = false
+  })
 
   let wrapper: HTMLDivElement
 
@@ -32,11 +37,30 @@
   }
 </script>
 
-{#await tasksRequest}
+{#if isFetchingTasks}
   loading timeline...
-{:then tasks}
+{:else if tasks}
   <div class="flex flex-1 flex-col items-start overflow-auto" bind:this={wrapper}>
     <TimelineDays />
-    <TimelineTasks {tasks} />
+    <TimelineTasks
+      {tasks}
+      onTaskDragEnd={(task, x, y) => {
+        tasks = tasks.map((currentTask) => {
+          if (currentTask.id === task.id) {
+            const startDate = dayjs(currentTask.start_date)
+            const endDate = dayjs(currentTask.end_date)
+            const diff = Math.round(x / TIMELINE_DAY_SIZE)
+
+            return {
+              ...currentTask,
+              start_date: startDate.add(diff, 'day').toString(),
+              end_date: endDate.add(diff, 'day').toString(),
+            }
+          }
+
+          return currentTask
+        })
+      }}
+    />
   </div>
-{/await}
+{/if}
