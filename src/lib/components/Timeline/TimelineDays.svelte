@@ -1,7 +1,7 @@
 <script lang="ts">
   import dayjs from 'dayjs'
-  import { TIMELINE_DAY_SIZE } from '../constants/timeline'
-  import { days } from '../stores/timeline'
+  import { days } from '../../stores/timeline'
+  import { TIMELINE_DAY_SIZE } from '../../constants/timeline'
 
   const today = dayjs()
 </script>
