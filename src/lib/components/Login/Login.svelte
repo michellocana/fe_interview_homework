@@ -34,7 +34,7 @@
       }
     }}
   >
-    <h1 class="mb-2 text-center text-lg font-bold text-slate-800">Sign in</h1>
+    <h1 class="mb-2 text-center text-lg text-slate-800">Sign in</h1>
 
     <Input bind:value={values.clientId} name="clientId" placeholder="Client ID" />
     <FormError error={validationErrors.clientId} />

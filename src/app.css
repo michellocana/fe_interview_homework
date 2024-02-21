@@ -6,9 +6,11 @@ html,
 body,
 #app {
   min-height: 100vh;
+  margin: 0;
 }
 
 #app {
   display: flex;
   flex-direction: column;
+  font-family: 'Roboto', sans-serif;
 }
