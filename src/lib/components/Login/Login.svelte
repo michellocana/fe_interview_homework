@@ -10,7 +10,7 @@
   let validationErrors: Record<string, string> = {}
 </script>
 
-<div class="flex flex-1 flex-col items-center justify-center">
+<div class="m-2 flex flex-1 flex-col items-center justify-center">
   <form
     class="m-2 flex w-full max-w-72 flex-col gap-2 rounded-lg border-2 bg-slate-100 p-4"
     on:submit|preventDefault={async () => {
