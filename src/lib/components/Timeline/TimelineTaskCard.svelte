@@ -15,6 +15,26 @@
   const color = TASK_COLORS.find((taskColor) => taskColor.id === task.color_id) ?? DEFAULT_TASK_COLOR
   const luminance = getRelativeLuminance(color.rgb)
   const isDarkColor = luminance <= 0.5
+
+  function getTimeLabel(minutes: number) {
+    let label = ''
+    const hours = Math.floor(minutes / 60)
+    const remainingMinutes = minutes % 60
+
+    if (minutes < 60) {
+      label = `${minutes}m`
+    } else if (remainingMinutes) {
+      label = `${hours}h ${remainingMinutes}m`
+    } else {
+      label = `${hours}h`
+    }
+
+    label += ' daily'
+
+    return label
+  }
+
+  const timeLabel = getTimeLabel(task.daily_estimated_minutes || task.estimated_minutes)
 </script>
 
 <style lang="postcss">
@@ -22,7 +42,7 @@
     grid-row: var(--task-row);
     grid-column: var(--task-column-start) / var(--task-column-end);
     background-color: var(--task-background);
-    @apply m-1 flex rounded-md px-2 py-1 text-left align-top text-sm text-slate-900;
+    @apply m-1 flex flex-col justify-center rounded-md px-2 text-left align-top text-sm text-slate-900;
     cursor: grab;
     user-select: none;
   }
@@ -50,10 +70,15 @@
   class:taskIsDragging={!isGhost && isDragging}
   style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}; --task-background: {color?.rgb}"
   style:transform="translate({x}px, {y}px)"
+  title={`${task.name} (${timeLabel})`}
   on:mousedown
   on:mouseup
 >
-  <span class="font-bold">
+  <span class="overflow-hidden text-ellipsis whitespace-nowrap font-bold">
     {task.name}
+  </span>
+
+  <span class="overflow-hidden text-ellipsis whitespace-nowrap text-xs text-slate-50">
+    {timeLabel}
   </span>
 </svelte:element>
