@@ -7,6 +7,7 @@
   import { accessToken, config, user } from './lib/stores/auth'
   import type { AuthenticateTokenRequest, AuthenticateTokenResponse, MeResponse } from './lib/types/network'
   import Spinner from './lib/components/UI/Spinner.svelte'
+  import Header from './lib/components/Header/Header.svelte'
 
   let isLoading = true
   let isLogged = false
@@ -59,12 +60,7 @@
     <Login />
   {:else}
     <div class="flex w-full flex-1 self-stretch">
-      <!-- TODO(michell): improve header -->
-      <div class="relative z-10 flex w-72 flex-none items-start gap-2 bg-fuchsia-950 p-2 shadow-xl shadow-slate-900">
-        <img src={$user.picture_url} alt={$user.name} class="rounded-full" />
-        <p class="text-slate-100">Welcome, {$user.name}</p>
-      </div>
-
+      <Header />
       <Timeline />
     </div>
   {/if}

@@ -62,12 +62,12 @@ export type Task = {
   task_type: string
   plan_status_position: null
   timeline_segment_id: number
-  tracked: false
+  tracked: boolean
   weight: number
   created_by: number
   created_at: string
   id: number
-  is_last_repetition: false
+  is_last_repetition: boolean
   tracking: null
   plan_id: number
   tag_ids: []
@@ -82,8 +82,8 @@ export type Task = {
   status: string
   repetition_rule: null
   folder_id: number
-  estimate_skips_weekend: true
-  done: false
+  estimate_skips_weekend: boolean
+  done: boolean
   end_time: null
   original_repeated_task_id: null
   start_time: null
@@ -98,7 +98,7 @@ export type Task = {
 export type CheckListItem = {
   created_at: string
   description: string
-  done: false
+  done: boolean
   id: number
   position: number
 }

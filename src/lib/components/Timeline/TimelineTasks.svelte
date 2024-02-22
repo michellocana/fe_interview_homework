@@ -6,7 +6,7 @@
   import type { TasksResponse } from '../../types/network'
   import { TIMELINE_DAY_SIZE, TIMELINE_START_ROW } from '../../constants/timeline'
   import TimelineTask from './TimelineTask.svelte'
-  import { workspace } from '../../stores/auth'
+  import { user, workspace } from '../../stores/auth'
 
   export let tasks: TasksResponse
   export let onTaskDragEnd: (task: Task, x: number, y: number) => void = () => {}
@@ -26,11 +26,38 @@
       columnEnd: 0,
     }))
 
+    const { hide_weekends: hideWeekends } = $user.preferences
+
     tasks.forEach((task, taskIndex) => {
       const taskStartDate = dayjs(task.start_date)
       const taskEndDate = dayjs(task.end_date)
-      const columnStart = Math.ceil(taskStartDate.diff($timelineStartDate, 'day', true)) + 1
-      const columnEnd = columnStart + taskEndDate.diff(taskStartDate, 'day') + 1
+      let daysDiff = taskEndDate.diff(taskStartDate, 'day')
+      const timelineStartDiff = Math.ceil(taskStartDate.diff($timelineStartDate, 'day', true))
+      let columnStart = timelineStartDiff + 1
+
+      // Adjust column start when task date range is inside a weekend
+      if (hideWeekends) {
+        const timelineStartDay = $timelineStartDate.day()
+
+        for (let index = timelineStartDay; index < timelineStartDay + timelineStartDiff; index++) {
+          const day = index % 7
+
+          if ([0, 6].includes(day)) {
+            columnStart--
+          }
+        }
+      }
+
+      let columnEnd = columnStart + daysDiff + 1
+
+      // Adjust column end when task date range is inside a weekend
+      if (hideWeekends) {
+        for (let index = taskStartDate.day(); index <= taskStartDate.day() + daysDiff; index++) {
+          if ([0, 6].includes(index % 7)) {
+            columnEnd--
+          }
+        }
+      }
 
       const partialStart = columnStart - 1
       const partialEnd = columnEnd - 1
@@ -93,7 +120,6 @@
 
         const dayRemainingTime = dayTasks.reduce((acc, task) => {
           if (task.estimate_type === 'total') {
-            console.log(task)
             return acc - task.daily_estimated_minutes
           }
 
