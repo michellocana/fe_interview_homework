@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import type { TaskDisposition } from '../types/timeline'
   import TimelineTaskCard from './TimelineTaskCard.svelte'
-  import type { Task } from '../types/plan'
+  import type { Task } from '../../types/plan'
+  import type { TaskDisposition } from '../../types/timeline'
 
   export let task: Task
   export let disposition: TaskDisposition
@@ -15,15 +15,40 @@
   let x: number = 0
   let y: number = 0
 
-  function onMouseMove(event: MouseEvent) {
+  type MouseOrTouchEvent = MouseEvent | TouchEvent
+
+  function extractPosition(event: MouseOrTouchEvent, property: 'clientX' | 'clientY') {
+    return event instanceof MouseEvent ? event[property] : event.touches[0][property]
+  }
+
+  function onMove(event: MouseOrTouchEvent) {
     if (isDragging) {
-      x = event.clientX - dragInitialX
-      y = event.clientY - dragInitialY
+      x = extractPosition(event, 'clientX') - dragInitialX
+      y = extractPosition(event, 'clientY') - dragInitialY
     }
   }
 
-  onMount(() => document.addEventListener('mousemove', onMouseMove))
-  onDestroy(() => document.removeEventListener('mousemove', onMouseMove))
+  onMount(() => {
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('touchmove', onMove)
+  })
+  onDestroy(() => {
+    document.removeEventListener('mousemove', onMove)
+    document.removeEventListener('touchmove', onMove)
+  })
+
+  function onDown(event: MouseOrTouchEvent) {
+    isDragging = true
+    dragInitialX = extractPosition(event, 'clientX')
+    dragInitialY = extractPosition(event, 'clientY')
+  }
+
+  function onUp() {
+    onDragEnd(x, y)
+    isDragging = false
+    x = 0
+    y = 0
+  }
 </script>
 
 {#if isDragging}
@@ -37,15 +62,8 @@
   {x}
   {y}
   element="button"
-  on:mousedown={(event) => {
-    isDragging = true
-    dragInitialX = event.clientX
-    dragInitialY = event.clientY
-  }}
-  on:mouseup={(event) => {
-    onDragEnd(x, y)
-    isDragging = false
-    x = 0
-    y = 0
-  }}
+  on:mousedown={onDown}
+  on:mouseup={onUp}
+  on:touchstart={onDown}
+  on:touchend={onUp}
 />

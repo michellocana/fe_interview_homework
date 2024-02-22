@@ -71,8 +71,10 @@
   style="--task-row: {disposition.row}; --task-column-start: {disposition.columnStart}; --task-column-end: {disposition.columnEnd}; --task-background: {color?.rgb}"
   style:transform="translate({x}px, {y}px)"
   title={`${task.name} (${timeLabel})`}
-  on:mousedown
-  on:mouseup
+  on:mousedown|preventDefault
+  on:mouseup|preventDefault
+  on:touchstart|preventDefault
+  on:touchend|preventDefault
 >
   <span class="overflow-hidden text-ellipsis whitespace-nowrap font-bold">
     {task.name}

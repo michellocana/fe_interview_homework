@@ -53,7 +53,7 @@
 </script>
 
 {#if isFetchingTasks}
-  <p class="flex w-full items-center justify-center gap-3 text-base text-slate-800">
+  <p class="flex w-full flex-1 items-center justify-center gap-3 text-base text-slate-800">
     <Spinner />
     Loading timeline...
   </p>
