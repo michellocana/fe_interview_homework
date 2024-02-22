@@ -8,8 +8,9 @@
   import { timelineEndDate, timelineStartDate } from '../../stores/timeline'
   import { api } from '../../../api'
   import { TIMELINE_DAY_SIZE } from '../../constants/timeline'
-  import { config } from '../../stores/auth'
+  import { config, user } from '../../stores/auth'
   import Spinner from '../UI/Spinner.svelte'
+  import diffWeekDays from '../../helpers/diffWeekDays'
 
   let tasks: TasksResponse
   let isFetchingTasks = true
@@ -29,13 +30,25 @@
 
   let wrapper: HTMLDivElement
 
-  $: if (wrapper && !didScrollToStartDay) {
+  $: if (wrapper) {
     const today = dayjs()
     const daysDiff = today.diff($timelineStartDate, 'days')
 
-    // Scrolling to current day, but showing the last 3 days just like the production app
-    wrapper.scroll(TIMELINE_DAY_SIZE * (daysDiff - 3), 0)
-    didScrollToStartDay = true
+    if (!didScrollToStartDay) {
+      // Scrolling to current day, but showing the last 3 days just like the production app
+      wrapper.scroll(TIMELINE_DAY_SIZE * (daysDiff - 3), 0)
+      didScrollToStartDay = true
+    } else {
+      const hideWeekends = $user.preferences.hide_weekends
+
+      // Scrolling to current day whenever the hide weekends setting changes
+      if (hideWeekends) {
+        const diff = diffWeekDays($timelineStartDate, today) - 3
+        wrapper.scroll(TIMELINE_DAY_SIZE * diff, 0)
+      } else {
+        wrapper.scroll(TIMELINE_DAY_SIZE * (daysDiff - 3), 0)
+      }
+    }
   }
 </script>
 
