@@ -59,7 +59,7 @@
   {:else if !isLogged}
     <Login />
   {:else}
-    <div class="flex w-full flex-1 self-stretch">
+    <div class="flex w-full flex-1 flex-col self-stretch lg:flex-row">
       <Header />
       <Timeline />
     </div>

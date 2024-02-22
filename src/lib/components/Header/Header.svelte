@@ -31,7 +31,7 @@
 </style>
 
 <div
-  class="relative z-10 flex w-72 flex-none flex-col items-start gap-4 bg-fuchsia-950 p-4 text-slate-100 shadow-xl shadow-slate-900"
+  class="relative z-10 flex w-full flex-none flex-col items-start gap-4 bg-fuchsia-950 p-4 text-slate-100 shadow-lg shadow-slate-300 lg:w-72 lg:shadow-xl lg:shadow-slate-900"
 >
   <div class="flex w-full items-center gap-2">
     <img src={$user.picture_url} alt={$user.name} class="rounded-full" />
